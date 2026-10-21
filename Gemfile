@@ -10,4 +10,5 @@ group :development, :test do
   gem 'rbs'
   gem 'rdoc', '>= 8.1'
   gem 'rubocop'
+  gem 'simplecov', require: false
 end
