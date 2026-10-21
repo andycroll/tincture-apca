@@ -41,6 +41,8 @@ module Tincture # :nodoc:
       loClip: 0.1
     }.freeze
 
+    LINEAR_CHANNELS = Array.new(256) { (it / 255.0)**SA98G[:mainTRC] }.freeze # :nodoc:
+
     module_function
 
     # Lc for text on a background, from their #luminance values. Positive for
@@ -65,10 +67,9 @@ module Tincture # :nodoc:
     #
     #: ([Integer, Integer, Integer] rgb) -> Float
     def luminance((red, green, blue))
-      (SA98G[:sRco] * linear(red)) + (SA98G[:sGco] * linear(green)) + (SA98G[:sBco] * linear(blue))
+      (SA98G[:sRco] * LINEAR_CHANNELS[red]) + (SA98G[:sGco] * LINEAR_CHANNELS[green]) +
+        (SA98G[:sBco] * LINEAR_CHANNELS[blue])
     end
-
-    def linear(channel) = (channel / 255.0)**SA98G[:mainTRC] # :nodoc:
 
     def soft_clamped(luminance) # :nodoc:
       luminance > SA98G[:blkThrs] ? luminance : luminance + ((SA98G[:blkThrs] - luminance)**SA98G[:blkClmp])
@@ -84,7 +85,7 @@ module Tincture # :nodoc:
       sapc > -SA98G[:loClip] ? 0.0 : sapc + SA98G[:loWoBoffset]
     end
 
-    private_class_method :linear, :soft_clamped, :dark_on_light, :light_on_dark
+    private_class_method :soft_clamped, :dark_on_light, :light_on_dark
 
     # Added to Tincture::Color.
     module ColorMethods
