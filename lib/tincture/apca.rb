@@ -102,15 +102,15 @@ module Tincture # :nodoc:
       #: (String | Color background) -> Float
       def apca_contrast(background)
         background = Color.parse(background)
-        text = opaque? ? self : blended_over(background)
+        text_rgb = opaque? ? rgb : rgb_blended_over(background)
 
-        Apca.contrast(Apca.luminance(text.rgb), Apca.luminance(background.rgb))
+        Apca.contrast(Apca.luminance(text_rgb), Apca.luminance(background.rgb))
       end
 
       private
 
-      def blended_over(background)
-        Color.rgb(*rgb.zip(background.rgb).map { |mine, theirs| (theirs * (1 - alpha)) + (mine * alpha) })
+      def rgb_blended_over(background)
+        rgb.zip(background.rgb).map { |mine, theirs| ((theirs * (1 - alpha)) + (mine * alpha)).round }
       end
     end
   end
