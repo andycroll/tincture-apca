@@ -41,6 +41,8 @@ module Tincture # :nodoc:
       loClip: 0.1
     }.freeze
 
+    LINEAR_CHANNELS = Array.new(256) { (it / 255.0)**SA98G[:mainTRC] }.freeze # :nodoc:
+
     module_function
 
     # Lc for text on a background, from their #luminance values. Positive for
@@ -49,7 +51,8 @@ module Tincture # :nodoc:
     #
     #: (Float text_y, Float background_y) -> Float
     def contrast(text_y, background_y)
-      text_y, background_y = [text_y, background_y].map { soft_clamped(it) }
+      text_y = soft_clamped(text_y)
+      background_y = soft_clamped(background_y)
 
       lc =
         if (background_y - text_y).abs < SA98G[:deltaYmin] then 0.0
@@ -65,10 +68,9 @@ module Tincture # :nodoc:
     #
     #: ([Integer, Integer, Integer] rgb) -> Float
     def luminance((red, green, blue))
-      (SA98G[:sRco] * linear(red)) + (SA98G[:sGco] * linear(green)) + (SA98G[:sBco] * linear(blue))
+      (SA98G[:sRco] * LINEAR_CHANNELS[red]) + (SA98G[:sGco] * LINEAR_CHANNELS[green]) +
+        (SA98G[:sBco] * LINEAR_CHANNELS[blue])
     end
-
-    def linear(channel) = (channel / 255.0)**SA98G[:mainTRC] # :nodoc:
 
     def soft_clamped(luminance) # :nodoc:
       luminance > SA98G[:blkThrs] ? luminance : luminance + ((SA98G[:blkThrs] - luminance)**SA98G[:blkClmp])
@@ -84,7 +86,7 @@ module Tincture # :nodoc:
       sapc > -SA98G[:loClip] ? 0.0 : sapc + SA98G[:loWoBoffset]
     end
 
-    private_class_method :linear, :soft_clamped, :dark_on_light, :light_on_dark
+    private_class_method :soft_clamped, :dark_on_light, :light_on_dark
 
     # Added to Tincture::Color.
     module ColorMethods
@@ -100,15 +102,15 @@ module Tincture # :nodoc:
       #: (String | Color background) -> Float
       def apca_contrast(background)
         background = Color.parse(background)
-        text = opaque? ? self : blended_over(background)
+        text_rgb = opaque? ? rgb : rgb_blended_over(background)
 
-        Apca.contrast(Apca.luminance(text.rgb), Apca.luminance(background.rgb))
+        Apca.contrast(Apca.luminance(text_rgb), Apca.luminance(background.rgb))
       end
 
       private
 
-      def blended_over(background)
-        Color.rgb(*rgb.zip(background.rgb).map { |mine, theirs| (theirs * (1 - alpha)) + (mine * alpha) })
+      def rgb_blended_over(background)
+        rgb.zip(background.rgb).map { |mine, theirs| ((theirs * (1 - alpha)) + (mine * alpha)).round }
       end
     end
   end
