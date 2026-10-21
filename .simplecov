@@ -2,6 +2,7 @@
 
 SimpleCov.configure do
   enable_coverage :branch
+  minimum_coverage line: 100, branch: 100
   cover 'lib/**/*.rb'
   skip 'lib/tincture/apca/version.rb'
 end
