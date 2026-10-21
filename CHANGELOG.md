@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 (2026-10-21)
 
 - Performance: `apca_contrast` is about 30% faster and `Apca.luminance` about 2.5 times faster. Luminance looks up each channel's linear value in a table and no longer computes a power. Results are unchanged.
 - Performance: `Apca.contrast` is about 25% faster. It no longer builds an array to soft-clamp its two luminances.
