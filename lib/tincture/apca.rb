@@ -51,7 +51,8 @@ module Tincture # :nodoc:
     #
     #: (Float text_y, Float background_y) -> Float
     def contrast(text_y, background_y)
-      text_y, background_y = [text_y, background_y].map { soft_clamped(it) }
+      text_y = soft_clamped(text_y)
+      background_y = soft_clamped(background_y)
 
       lc =
         if (background_y - text_y).abs < SA98G[:deltaYmin] then 0.0
