@@ -1,0 +1,15 @@
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+
+# Method types are inline RBS comments: `#: (String) -> Color`.
+Layout/LeadingCommentSpace:
+  AllowRBSInlineAnnotation: true
+
+# `rake rdoc` and `rdoc -C lib` check the documentation.
+Style/Documentation:
+  Enabled: false
+
+# Prefer an expanded if/else to a guard clause.
+Style/GuardClause:
+  Enabled: false
